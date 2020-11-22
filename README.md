@@ -29,7 +29,7 @@ Go to "download" and download CRISPR(Avana) Public data, expression data and mut
 
 ## Mutation Analysis
 ### Example with colorectal cancer
-![alt text](https://github.com/jameshyojaelee/gene_knockout_effect/blob/master/mutation_analysis/colorectal.png)
+![alt text](https://github.com/jameshyojaelee/gene_knockout_effect/blob/main/mutation_analysis/analysis%20results/colorectal.png)
 <br />
 <br />
 <br />
