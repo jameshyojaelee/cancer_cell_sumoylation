@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1603158858613.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2638003445",
+    "id" : "7AE697E",
+    "lastKnownWriteTime" : 1602532374,
+    "last_content_update" : 1602532374,
+    "path" : "C:/Users/james/Desktop/Gene KO/project/Main_Gene_effect.R",
+    "project_path" : "Main_Gene_effect.R",
+    "properties" : {
+        "cursorPosition" : "209,16",
+        "scrollLine" : "186"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

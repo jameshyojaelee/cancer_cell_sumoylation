@@ -1,0 +1,529 @@
+library(devtools)
+library(ggplot2)
+library("scales")
+library(dplyr)
+library(gridExtra)
+
+#read necessary csv files
+setwd("/Users/james/Desktop/Gene KO/project")
+gene_effect <- read.csv("Achilles_gene_effect.csv") #CRISPR(Avana)
+cclID <- read.csv("sample_info.csv") #list of all cell lines, ID and lineage
+ccl_mut <- read.csv("CCLE_mutations.csv") #import mutation info
+exp <- read.csv("CCLE_expression.csv") #gene expression data for just protein coding genes
+
+#dataframe with the cancer cell line names
+ccl_df <- data.frame(ID = cclID$DepMap_ID, ccl = cclID$stripped_cell_line_name, lineage = cclID$lineage)
+
+#dataframe with the gene effect score (example with UBA2 Gene ONLY)
+UBA2_df <- data.frame(ID = gene_effect$DepMap_ID, UBA2_gene_effect = gene_effect$UBA2)
+nrow(UBA2_df) #number of rows
+
+#Merge cell line info and gene effect score
+UBA2_merged <- merge(x = ccl_df, 
+                  y = UBA2_df,
+                  by = "ID")
+UBA2_merged <- droplevels(UBA2_merged)
+
+
+################################################################################################################
+#part 1 - UBA2 gene effect per lineage. below -1 is a viable threshold
+
+#boxplot with different cell types and their gene effects
+boxplot(UBA2_gene_effect ~ lineage,
+        data=UBA2_merged,
+        main="UBA2 gene KO effect per lineage",
+        xlab="Lineage",
+        ylab="Gene effect",
+        col="red",
+        border="black"
+)
+
+#(optional) individual dots added
+stripchart(UBA2_gene_effect ~ lineage, vertical = TRUE, data = UBA2_merged, 
+           method = "jitter", add = TRUE, pch = 21, col = 'black')
+
+
+################################################################################################################
+#part2 - Enrichment Analysis
+
+#(a) Explore the UBA2 effect scores on each lineage
+
+#colorectal 
+
+colorectal <- UBA2_merged[which(UBA2_merged$lineage == "colorectal"),]
+colorectal <- colorectal[order(colorectal$UBA2_gene_effect), ]
+colorectal_scores <-colorectal$UBA2_gene_effect
+colorectal_average <- mean(colorectal_scores)
+colorectal_sd <- sd(colorectal_scores)
+min(colorectal_scores)
+max(colorectal_scores)
+
+length(colorectal$UBA2_gene_effect)
+length(which(colorectal$UBA2_gene_effect < colorectal_average))
+
+enrich_title <- paste("UBA2 gene effect in", colorectal$lineage ,"cancer cells \n (",
+               length(which(colorectal$UBA2_gene_effect < colorectal_average)),
+               "cell lines out of ",length(colorectal$UBA2_gene_effect)," with UBA2 score <" ,
+               round(colorectal_average, digits = 3), ")")
+
+
+enrich <- ggplot(data = colorectal , aes(x = UBA2_gene_effect, y = lineage, width= 0.05)) +
+                ggtitle(enrich_title) +
+                geom_tile(aes(fill = UBA2_gene_effect)) +
+                scale_fill_gradientn(colours = c("red","white","white","white"),
+                                     guide = "colorbar", limits=c(min(colorectal_scores),0)) +
+                scale_x_continuous(limits=c(min(colorectal_scores),0))+
+                theme_bw()  + theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold"), 
+                                    panel.background = element_rect(fill = "lightgrey", colour = "lightgrey",
+                                                                    size = 2, linetype = "solid"),
+                                    panel.grid.major = element_blank(),
+                                    panel.grid.minor = element_blank(),
+                                    panel.border = element_blank())
+enrich
+lineage_vect <- unique(UBA2_merged$lineage)
+
+################################################################################################################
+#(b) Common mutation
+
+colnames(ccl_mut)[which(names(ccl_mut) == "DepMap_ID")] <- "ID"
+ccl_mut <- subset(ccl_mut, select = c("ID", "Hugo_Symbol", "Variant_Classification"))
+
+
+#import the auc data to manipulate
+gene_effect_mutation <- merge(x = UBA2_merged, 
+                            y = ccl_mut,
+                            by = "ID")
+
+#eliminate silent mutations
+gene_effect_mutation <- gene_effect_mutation[which(gene_effect_mutation$Variant_Classification != "Silent"),]
+
+#eliminate duplicated rows
+gene_effect_mutation <- unique(gene_effect_mutation)
+
+
+########example with colorectal cells
+colorectal_mutation <- gene_effect_mutation[which(gene_effect_mutation$lineage == "colorectal"), ]
+
+#calculate the number of unique ccl
+length(unique(colorectal_mutation$ccl))
+#turns out to be 36 ccls
+
+#subset of colorectal cell lines with below threshold gene effect score
+colorectal_valid_mut <- colorectal_mutation[which(colorectal_mutation$UBA2_gene_effect <= colorectal_average), ]
+colorectal_valid_mut <- droplevels(colorectal_valid_mut)
+#subset of cell lines with above threshold
+colorectal_invalid_mut <- colorectal_mutation[which(colorectal_mutation$UBA2_gene_effect > colorectal_average), ]
+colorectal_invalid_mut <- droplevels(colorectal_invalid_mut)
+
+#eliminate mutations that also occur in invalid
+#colorectal_valid_mut1 <- colorectal_valid_mut[!duplicated(colorectal_invalid_mut[c('Hugo_Symbol', 'Variant_Classification')]),] 
+colorectal_mut_final <- anti_join(colorectal_valid_mut, colorectal_invalid_mut, 
+                       by=c("Hugo_Symbol", "Variant_Classification"), copy = TRUE)
+
+#calculate the mode (most frequent mutation)
+calculate_mode <- function(x) {
+        uniqx <- unique(na.omit(x))
+        uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+calculate_mode(colorectal_mut_final$Hugo_Symbol)
+#turns out to be HUWE1
+
+colorectal_HUWE1 <- colorectal_mut_final[which(colorectal_mut_final$Hugo_Symbol == "HUWE1"), ]
+colorectal_no_HUWE1 <- colorectal_mut_final[which(colorectal_mut_final$Hugo_Symbol != "HUWE1"), ]
+
+#find the most frequent variant type
+calculate_mode(colorectal_HUWE1$Variant_Classification)
+#turns out to be Missense_Mutation
+
+
+#create subset with HUWE1_Missense
+colorectal_HUWE1_Mis <- colorectal_HUWE1[which(colorectal_HUWE1$Variant_Classification == "Missense_Mutation"), ]
+colorectal_HUWE1_No_Mis <- colorectal_HUWE1[which(colorectal_HUWE1$Variant_Classification != "Missense_Mutation"), ]
+colorectal_HUWE1 <- droplevels(colorectal_HUWE1)
+#7 cell lines with HUWE1 Missense mutation
+
+
+y <- length(colorectal_HUWE1_Mis$ID)
+x <- length(colorectal$ccl)
+x <- x - y
+
+
+final_table <- data.frame(mutation = c("HUWE1", "other"), counts = c(y, x))
+
+bar_title <- paste("Mut: HUWE1 Missense Mutation \n", y, "overlaps out of", x, "total")
+
+bar <- ggplot(data = final_table, aes(x= mutation, y=counts)) +
+        ggtitle(bar_title) +
+        geom_bar(stat="identity", fill = "white", colour = "black")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold"), 
+              panel.background = element_rect(fill = "lightgrey", colour = "lightgrey",
+                                              size = 2, linetype = "solid"))
+
+
+#######################################################################################################################
+#(c) mut, lacks mut
+
+#subset of all ccl
+colorectal_ccl <- distinct(colorectal_mutation, ccl, .keep_all= TRUE )
+
+colorectal_ccl[match(colorectal_HUWE1$ID, colorectal_ccl$ID), ] <- colorectal_HUWE1
+
+colorectal_ccl$Hugo_Symbol <- as.character(colorectal_ccl$Hugo_Symbol)
+
+colorectal_ccl$Hugo_Symbol[colorectal_ccl$Hugo_Symbol == "HUWE1"] <- "has Mut"
+colorectal_ccl$Hugo_Symbol[colorectal_ccl$Hugo_Symbol != "has Mut"] <- "lacks Mut"
+
+t <- t.test(UBA2_gene_effect ~ Hugo_Symbol, data =colorectal_ccl) 
+
+box_title <- paste("UBA2 gene effect \n", "T-test p-value =", round(t$p.value, digits = 4))
+
+box <- ggplot(colorectal_ccl, aes(x= Hugo_Symbol, y=UBA2_gene_effect)) +
+        ggtitle(box_title) +
+        geom_boxplot(fill = "white", colour = "black", outlier.colour = "red")+
+         theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold"), 
+                            panel.background = element_rect(fill = "lightgrey", colour = "lightgrey",
+                                                            size = 2, linetype = "solid"))
+
+
+library(gridExtra)
+
+grid.arrange(grobs= list(enrich, bar, box), 
+             layout_matrix = rbind(c(1, 1), c(1, 1), c(2, 3), c(2, 3), c(2, 3)))
+
+
+########################################################################################################################
+#Part 3 - correlation analysis
+
+#dataframe with gene expression
+exp_df <- data.frame(ID = exp$X, UBA2_expression_level = exp$UBA2)
+
+
+#Merge cell line info and gene expression data
+final_df <- merge(x = UBA2_merged,
+                  y = exp_df,
+                  by = "ID")
+
+#eliminate empty data columns and rows
+final_df <- droplevels(final_df)
+
+
+library(ggpmisc)
+
+#example with colorectal cell lines
+colorectal_final <- final_df[which(final_df$lineage == "colorectal"), ]
+
+colorectal_plot <- ggplot(colorectal_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("colorectal") + 
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red") +
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+
+blood_final <- final_df[which(final_df$lineage == "blood"), ]
+
+blood_plot <- ggplot(blood_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("blood") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+urinary_tract_final <- final_df[which(final_df$lineage == "urinary_tract"), ]
+
+urinary_tract_plot <- ggplot(urinary_tract_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("urinary_tract") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+lung_final <- final_df[which(final_df$lineage == "lung"), ]
+
+lung_plot <- ggplot(lung_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("lung") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+ovary_final <- final_df[which(final_df$lineage == "ovary"), ]
+
+ovary_plot <- ggplot(ovary_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("ovary") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+skin_final <- final_df[which(final_df$lineage == "skin"), ]
+
+skin_plot <- ggplot(skin_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("skin") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+breast_final <- final_df[which(final_df$lineage == "breast"), ]
+
+breast_plot <- ggplot(breast_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("breast") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+pancreas_final <- final_df[which(final_df$lineage == "pancreas"), ]
+
+pancreas_plot <- ggplot(pancreas_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("pancreas") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+plasma_cell_final <- final_df[which(final_df$lineage == "plasma_cell"), ]
+
+plasma_cell_plot <- ggplot(plasma_cell_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("plasma_cell") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+central_nervous_system_final <- final_df[which(final_df$lineage == "central_nervous_system"), ]
+
+central_nervous_system_plot <- ggplot(central_nervous_system_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("central_nervous_system") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+soft_tissue_final <- final_df[which(final_df$lineage == "soft_tissue"), ]
+
+soft_tissue_plot <- ggplot(soft_tissue_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("soft_tissue") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+bone_final <- final_df[which(final_df$lineage == "bone"), ]
+
+bone_plot <- ggplot(bone_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("bone") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+gastric_final <- final_df[which(final_df$lineage == "gastric"), ]
+
+formula <- y ~ x
+
+library(ggpmisc)
+gastric_plot <- ggplot(gastric_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("gastric") + 
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "right", label.y.npc = 0.15,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+ 
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+lymphocyte_final <- final_df[which(final_df$lineage == "lymphocyte"), ]
+
+lymphocyte_plot <- ggplot(lymphocyte_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("lymphocyte") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+peripheral_nervous_system_final <- final_df[which(final_df$lineage == "peripheral_nervous_system"), ]
+
+peripheral_nervous_system_plot <- ggplot(peripheral_nervous_system_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("peripheral_nervous_system") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+kidney_final <- final_df[which(final_df$lineage == "kidney"), ]
+
+kidney_plot <- ggplot(kidney_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("kidney") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+prostate_final <- final_df[which(final_df$lineage == "prostate"), ]
+
+prostate_plot <- ggplot(prostate_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("prostate") +
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+fibroblast_final <- final_df[which(final_df$lineage == "fibroblast"), ]
+
+fibroblast_plot <- ggplot(fibroblast_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("fibroblast") +
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+bile_duct_final <- final_df[which(final_df$lineage == "bile_duct"), ]
+
+bile_duct_plot <- ggplot(bile_duct_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("bile_duct") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+thyroid_final <- final_df[which(final_df$lineage == "thyroid"), ]
+
+thyroid_plot <- ggplot(thyroid_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("thyroid") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+upper_aerodigestive_final <- final_df[which(final_df$lineage == "upper_aerodigestive"), ]
+
+upper_aerodigestive_plot <- ggplot(upper_aerodigestive_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("upper_aerodigestive") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+liver_final <- final_df[which(final_df$lineage == "liver"), ]
+
+liver_plot <- ggplot(liver_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("liver") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+uterus_final <- final_df[which(final_df$lineage == "uterus"), ]
+
+uterus_plot <- ggplot(uterus_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("uterus") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+esophagus_final <- final_df[which(final_df$lineage == "esophagus"), ]
+
+
+esophagus_plot <- ggplot(esophagus_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("esophagus") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+cervix_final <- final_df[which(final_df$lineage == "cervix"), ]
+
+cervix_plot <- ggplot(cervix_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("cervix") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+eye_final <- final_df[which(final_df$lineage == "eye"), ]
+
+eye_plot <- ggplot(eye_final, aes(x= UBA2_gene_effect, y =UBA2_expression_level)) + 
+        ggtitle("eye") +
+        geom_smooth(method='lm', formula= y~x, se=FALSE, color="black") +
+        stat_poly_eq(aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~")), 
+                     label.x.npc = "left", label.y.npc = 0.7,
+                     formula = formula, parse = TRUE, size = 5)+
+        geom_point(color = "red")+
+        theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold")) +
+        theme_bw()
+
+
+
+grid.arrange(eye_plot, esophagus_plot, gastric_plot, bone_plot, pancreas_plot, kidney_plot, peripheral_nervous_system_plot,
+             skin_plot, plasma_cell_plot, lymphocyte_plot, uterus_plot, thyroid_plot, central_nervous_system_plot,  bile_duct_plot,
+             breast_plot, upper_aerodigestive_plot, blood_plot, lung_plot, liver_plot, urinary_tract_plot, colorectal_plot, 
+             ovary_plot,  cervix_plot, soft_tissue_plot, prostate_plot, fibroblast_plot
+             ,ncol =5, nrow =6)
+
