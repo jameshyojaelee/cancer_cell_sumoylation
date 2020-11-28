@@ -9,8 +9,8 @@ folder with all the mutation analyses using UBA2 gene knockout effect data. cont
 <br />
 
 ## Data set
-all the data files are provided by DepMap Portal (https://depmap.org/portal/)
-Go to "download" and download CRISPR(Avana) Public data, expression data and mutation data in csv format
+all the data files are provided by Broad Institute's DepMap Portal (https://depmap.org/portal/)
+Go to "download" to view the details of CRISPR(Avana) Public data, expression data and mutation data in csv format. Below are the download links:
 
 >Achilles_gene_effect.csv -> https://ndownloader.figshare.com/files/25494359
 
