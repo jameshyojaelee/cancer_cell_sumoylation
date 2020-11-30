@@ -1,6 +1,6 @@
 # CRISPR Gene Knockout Effect
 
-## Main_Gene_Effect.R
+## [Main_Gene_Effect.R](https://github.com/jameshyojaelee/Gene_knockout_effect/raw/main/Main_Gene_effect.R)
 main R file with source code <br />
 <br />
 
