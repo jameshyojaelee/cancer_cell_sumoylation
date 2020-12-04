@@ -1,7 +1,7 @@
 # CRISPR Gene Knockout Effect
 
-## Main_Gene_Effect.R
-main R file with source code <br />
+## [Main_Gene_Effect.R](https://github.com/jameshyojaelee/Gene_knockout_effect/raw/main/Main_Gene_effect.R)
+Main R script with source code <br />
 <br />
 
 ## Mutation_analysis
@@ -9,14 +9,14 @@ folder with all the mutation analyses using UBA2 gene knockout effect data. cont
 <br />
 
 ## Data set
-all the data files are provided by DepMap Portal (https://depmap.org/portal/)
-Go to "download" and download CRISPR(Avana) Public data, expression data and mutation data in csv format
+all the data files are provided by Broad Institute's [DepMap Portal](https://depmap.org/portal/)
+Go to "download" to view the details of CRISPR(Avana) Public data, expression data and mutation data in csv format. Below are the download links:
 
->Achilles_gene_effect.csv -> https://ndownloader.figshare.com/files/25494359
+>[Achilles_gene_effect.csv](https://ndownloader.figshare.com/files/25494359)
 
->sample_info.csv -> https://ndownloader.figshare.com/files/25494443
+>[sample_info.csv](https://ndownloader.figshare.com/files/25494443)
 
->CCLE_mutations.csv -> https://ndownloader.figshare.com/files/25494419 
+>[CCLE_mutations.csv](https://ndownloader.figshare.com/files/25494419)
 
 <br />
 
@@ -29,7 +29,7 @@ Go to "download" and download CRISPR(Avana) Public data, expression data and mut
 
 ## Mutation Analysis
 ### Example with colorectal cancer
-![alt text](https://github.com/jameshyojaelee/gene_knockout_effect/blob/master/mutation_analysis/colorectal.png)
+![alt text](https://github.com/jameshyojaelee/gene_knockout_effect/blob/main/mutation_analysis/analysis%20results/colorectal.png)
 <br />
 <br />
 <br />
