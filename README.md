@@ -33,3 +33,11 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 <br />
 <br />
 <br />
+
+
+## Pathway Analysis
+### Example with HUWE1 (found in colorectal cancer mutation analysis) 
+![alt text](https://github.com/jameshyojaelee/Gene_knockout_effect/blob/main/pathway_analysis/HUWE1/hsa04120.png)
+
+### Example with CDKN2A (found in pancreatic cancer mutation analysis) 
+![alt text](https://github.com/jameshyojaelee/Gene_knockout_effect/blob/main/pathway_analysis/CDKN2A/hsa04110.png)
