@@ -6,10 +6,10 @@ library(gridExtra)
 
 #read necessary csv files
 setwd("/Users/james/Desktop/Gene KO/project")
-gene_effect <- read.csv("Achilles_gene_effect.csv") #CRISPR(Avana) data
-cclID <- read.csv("sample_info.csv") #list of all cell lines, ID and lineage
-ccl_mut <- read.csv("CCLE_mutations.csv") #import mutation info
-exp <- read.csv("CCLE_expression.csv") #gene expression data for just protein coding genes
+gene_effect <- read.csv("C:/Users/james/Desktop/Gene KO/data/Achilles_gene_effect.csv") #CRISPR(Avana) data
+cclID <- read.csv("C:/Users/james/Desktop/Gene KO/data/sample_info.csv") #list of all cell lines, ID and lineage
+ccl_mut <- read.csv("C:/Users/james/Desktop/Gene KO/data/CCLE_mutations.csv") #import mutation info
+exp <- read.csv("C:/Users/james/Desktop/Gene KO/data/CCLE_expression.csv", fileEncoding="UTF-8-BOM") #gene expression data for just protein coding genes
 
 #dataframe with the cancer cell line names
 ccl_df <- data.frame(ID = cclID$DepMap_ID, ccl = cclID$stripped_cell_line_name, lineage = cclID$lineage)
@@ -111,7 +111,7 @@ enrichment <- function(cell_line){
   
   return (enrich)
 }
-enrichment("uterus")
+enrichment("colorectal")
 #lineage <- unique(UBA2_merged$lineage)
 #lineage <- as.list(lineage)
 #all_enrich <- list()
@@ -301,7 +301,7 @@ mutation_analysis <- function(cell_line){
 
 
 #must type in argument as a string (wrapped with "")
-mutation_analysis("uterus")
+mutation_analysis("colorectal")
 
 
 
