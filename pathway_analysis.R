@@ -1,5 +1,7 @@
 #Pathway Analysis
 
+library(BiocManager)
+library(DESeq2)
 library(pathview)
 library(gage)
 library(gageData)
@@ -8,19 +10,24 @@ library("org.Hs.eg.db")
 
 columns(org.Hs.eg.db)
 
+#import inhibition data with IC50 and AUC values
+indf <- read.csv("C:/Users/james/Desktop/Gene_knockout/project/inhibition/inhibition_data.csv", fileEncoding="UTF-8-BOM")
 
-col_AUC <- read.csv("C:/Users/james/Desktop/Gene KO/project/inhibition/colorectal_AUC_mut.csv", fileEncoding="UTF-8-BOM")
-col_IC50 <- read.csv("C:/Users/james/Desktop/Gene KO/project/inhibition/colorectal_IC50_mut.csv", fileEncoding="UTF-8-BOM")
-head(col_AUC)
-head(IC50)
+head(indf)
 
 
-col_path_df <- col_AUC
-col_path_df[] <- lapply(col_AUC, as.character)
 
-class(col_path_df$Hugo_Symbol)
 
-head(col_path_df)
+
+
+
+
+inhibition <- indf
+inhibition[] <- lapply(col_AUC, as.character)
+
+class(inhibition$cell)
+
+head(inhibition)
 
 col_path_df$symbol <- mapIds(org.Hs.eg.db,
                      keys=col_path_df$Hugo_Symbol, # Our genenames

@@ -5,11 +5,11 @@ library(dplyr)
 library(gridExtra)
 
 #read necessary csv files
-setwd("/Users/james/Desktop/Gene KO/project")
-gene_effect <- read.csv("C:/Users/james/Desktop/Gene KO/data/Achilles_gene_effect.csv") #CRISPR(Avana) data
-cclID <- read.csv("C:/Users/james/Desktop/Gene KO/data/sample_info.csv") #list of all cell lines, ID and lineage
-ccl_mut <- read.csv("C:/Users/james/Desktop/Gene KO/data/CCLE_mutations.csv") #import mutation info
-exp <- read.csv("C:/Users/james/Desktop/Gene KO/data/CCLE_expression.csv", fileEncoding="UTF-8-BOM") #gene expression data for just protein coding genes
+setwd("/Users/james/Desktop/Gene_knockout/project")
+gene_effect <- read.csv("C:/Users/james/Desktop/Gene_knockout/data/Achilles_gene_effect.csv") #CRISPR(Avana) data
+cclID <- read.csv("C:/Users/james/Desktop/Gene_knockout/data/sample_info.csv") #list of all cell lines, ID and lineage
+ccl_mut <- read.csv("C:/Users/james/Desktop/Gene_knockout/data/CCLE_mutations.csv") #import mutation info
+exp <- read.csv("C:/Users/james/Desktop/Gene_knockout/data/CCLE_expression.csv", fileEncoding="UTF-8-BOM") #gene expression data for just protein coding genes
 
 #dataframe with the cancer cell line names
 ccl_df <- data.frame(ID = cclID$DepMap_ID, ccl = cclID$stripped_cell_line_name, lineage = cclID$lineage)
@@ -88,15 +88,15 @@ enrichment <- function(cell_line){
   x <- UBA2_merged[which(UBA2_merged$lineage == cell_line),]
   x <- x[order(x$UBA2_gene_effect), ]
   scores <-x$UBA2_gene_effect
-  average <- mean(colorectal_scores)
-  sdev <- sd(colorectal_scores)
+  average <- mean(scores)
+  sdev <- sd(scores)
 
   enrich_title <- paste("UBA2 gene effect in", x$lineage ,"cancer cells \n (",
                         length(which(x$UBA2_gene_effect < average)),
                         "cell lines out of ",length(x$UBA2_gene_effect)," with UBA2 score <" ,
                         round(average, digits = 3), ")")
   
-  enrich <- ggplot(data = x , aes(x = UBA2_gene_effect, y = lineage, width= 0.05)) +
+  enrich <- ggplot(data = x , aes(x = UBA2_gene_effect, y = lineage, width= 0.1)) +
     ggtitle(enrich_title) +
     geom_tile(aes(fill = UBA2_gene_effect)) +
     scale_fill_gradientn(colours = c("red","white","white","white"),
@@ -111,7 +111,7 @@ enrichment <- function(cell_line){
   
   return (enrich)
 }
-enrichment("colorectal")
+enrichment("uterus")
 #lineage <- unique(UBA2_merged$lineage)
 #lineage <- as.list(lineage)
 #all_enrich <- list()
