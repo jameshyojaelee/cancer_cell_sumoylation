@@ -30,7 +30,7 @@ col_path_df$symbol <- mapIds(org.Hs.eg.db,
 
 
 mapIds(org.Hs.eg.db,
-       keys="BCOR", # Our genenames
+       keys="HUWE1", # Our genenames
        keytype="ALIAS",        # The format of our genenames
        column="PATH",          # The new format we want to add
        multiVals="first")
@@ -45,4 +45,4 @@ foldchanges = res$log2FoldChange
 names(foldchanges) = res$entrez
 head(foldchanges)
 
-pathview(col_path_df$AUC, pathway.id="05200")
+pathview(col_path_df$AUC, pathway.id="04120")
