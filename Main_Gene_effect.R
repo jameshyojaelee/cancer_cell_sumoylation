@@ -2,7 +2,9 @@ library(devtools)
 library(ggplot2)
 library("scales")
 library(dplyr)
+library(grid)
 library(gridExtra)
+
 
 #read necessary csv files
 setwd("/Users/james/Desktop/Gene_knockout/project")
@@ -99,7 +101,7 @@ enrichment <- function(cell_line){
   enrich <- ggplot(data = x , aes(x = UBA2_gene_effect, y = lineage, width= 0.1)) +
     ggtitle(enrich_title) +
     geom_tile(aes(fill = UBA2_gene_effect)) +
-    scale_fill_gradientn(colours = c("red","white","white","white"),
+    scale_fill_gradientn(colours = c("red","white","white"),
                          guide = "colorbar", limits=c(min(scores, na.rm=TRUE),0)) +
     scale_x_continuous(limits=c(min(scores),0))+
     theme_bw()  + theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold"), 
@@ -111,7 +113,7 @@ enrichment <- function(cell_line){
   
   return (enrich)
 }
-enrichment("uterus")
+enrichment("pancreas")
 #lineage <- unique(UBA2_merged$lineage)
 #lineage <- as.list(lineage)
 #all_enrich <- list()
@@ -223,7 +225,7 @@ box <- ggplot(colorectal_ccl, aes(x= Hugo_Symbol, y=UBA2_gene_effect)) +
 ##create function to repeat the process (b) and (c)  
 
 mutation_analysis <- function(cell_line){
-  
+  enrich <- enrichment(cell_line)
   mut <- gene_effect_mutation[which(gene_effect_mutation$lineage == cell_line), ]
 
   
@@ -248,13 +250,13 @@ mutation_analysis <- function(cell_line){
   #find the most frequent variant type
   variant <- calculate_mode(mut_mutated_gene$Variant_Classification)
   
-  #create subset with the specific variant
-  mut_mutated_gene_Mis <- mut_mutated_gene[which(mut_mutated_gene$Variant_Classification == variant), ]
+  #create subset with the specific variant from above
+  mut_mutated_gene_var <- mut_mutated_gene[which(mut_mutated_gene$Variant_Classification == variant), ]
   
   mut_mutated_gene <- droplevels(mut_mutated_gene)
   #7 cell lines with HUWE1 Missense mutation
   
-  y <- length(mut_mutated_gene_Mis$ccl)
+  y <- length(mut_mutated_gene_var$ccl)
   x <- length(unique(mut$ccl))
   x <- x - y
   
@@ -266,7 +268,7 @@ mutation_analysis <- function(cell_line){
   bar <- ggplot(data = final_table, aes(x= mutation, y=counts)) +
     ggtitle(bar_title) +
     geom_bar(stat="identity", fill = "white", colour = "black")+
-    theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold"), 
+    theme(plot.title = element_text(size=12, hjust = 0.5, face = "bold"), 
           panel.background = element_rect(fill = "lightgrey", colour = "lightgrey",
                                           size = 2, linetype = "solid"))
   
@@ -278,7 +280,7 @@ mutation_analysis <- function(cell_line){
   
   ccl$Hugo_Symbol <- as.character(ccl$Hugo_Symbol)
   
-  ccl$Hugo_Symbol[ccl$Hugo_Symbol == "HUWE1"] <- "has Mut"
+  ccl$Hugo_Symbol[ccl$Hugo_Symbol == mutated_gene] <- "has Mut"
   ccl$Hugo_Symbol[ccl$Hugo_Symbol != "has Mut"] <- "lacks Mut"
   
   t <- t.test(UBA2_gene_effect ~ Hugo_Symbol, data = ccl) 
@@ -288,12 +290,13 @@ mutation_analysis <- function(cell_line){
   box <- ggplot(ccl, aes(x= Hugo_Symbol, y=UBA2_gene_effect)) +
     ggtitle(box_title) +
     geom_boxplot(fill = "white", colour = "black", outlier.colour = "red")+
-    theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold"), 
+    theme(plot.title = element_text(size=12, hjust = 0.5, face = "bold"), 
           panel.background = element_rect(fill = "lightgrey", colour = "lightgrey",
                                           size = 2, linetype = "solid"))
   
   #arrange all 3 plots from (a), (b), and (c)
-  final_analysis <- grid.arrange(grobs= list(enrich, bar, box), 
+  # viewport() function controls the margin of the graph. (prevent graphs from getting cut off)
+  final_analysis <- grid.arrange(grobs= list(enrich, bar, box), vp=viewport(width=0.8, height=1),
                                  layout_matrix = rbind(c(1, 1), c(1, 1), c(2, 3), c(2, 3), c(2, 3)))
   
   return (final_analysis)
@@ -301,7 +304,7 @@ mutation_analysis <- function(cell_line){
 
 
 #must type in argument as a string (wrapped with "")
-mutation_analysis("colorectal")
+mutation_analysis("uterus")
 
 
 
