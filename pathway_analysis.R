@@ -65,17 +65,13 @@ for(i in 1:nrow(final_df)){
 }
 
 
-
 mapIds(org.Hs.eg.db,
-       keys="APC", # Our genenames
+       keys="TTN", # Our genenames
        keytype="ALIAS",        # The format of our genenames
        column="PATH",          # The new format we want to add
        multiVals="first")
 
-
 data(kegg.sets.hs)
-
 head(kegg.sets.hs, 2)
 
-
-pathview(panc_in$AUC, pathway.id="04310")
+pathview(panc_in$AUC, pathway.id="05410")
