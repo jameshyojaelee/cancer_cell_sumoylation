@@ -33,7 +33,8 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 <br />
 <br />
 <br />
-
+<br />
+<br />
 
 ## Pathway Analysis
 ### Example with HUWE1 (found in colorectal cancer mutation analysis) 
