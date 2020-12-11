@@ -10,15 +10,11 @@ library("org.Hs.eg.db")
 
 columns(org.Hs.eg.db)
 
+
 #import inhibition data with IC50 and AUC values
 indf <- read.csv("C:/Users/james/Desktop/Gene_knockout/project/inhibition/inhibition_data.csv", fileEncoding="UTF-8-BOM")
 
 head(indf)
-
-
-
-
-
 
 
 

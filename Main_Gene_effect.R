@@ -93,7 +93,7 @@ enrichment <- function(cell_line){
   average <- mean(scores)
   sdev <- sd(scores)
 
-  enrich_title <- paste("UBA2 gene effect in", x$lineage ,"cancer cells \n (",
+  enrich_title <- paste("UBA2 gene knockout effect in", x$lineage ,"cancer cells \n (",
                         length(which(x$UBA2_gene_effect < average)),
                         "cell lines out of ",length(x$UBA2_gene_effect)," with UBA2 score <" ,
                         round(average, digits = 3), ")")
@@ -104,7 +104,7 @@ enrichment <- function(cell_line){
     scale_fill_gradientn(colours = c("red","white","white"),
                          guide = "colorbar", limits=c(min(scores, na.rm=TRUE),0)) +
     scale_x_continuous(limits=c(min(scores),0))+
-    theme_bw()  + theme(plot.title = element_text(size=14, hjust = 0.5, face = "bold"), 
+    theme_bw()  + theme(plot.title = element_text(size=12, hjust = 0.5, face = "bold"), 
                         panel.background = element_rect(fill = "lightgrey", colour = "lightgrey",
                                                         size = 2, linetype = "solid"),
                         panel.grid.major = element_blank(),
