@@ -39,33 +39,18 @@ colo_in <- final_df[final_df$lineage == "colorectal", ]
 panc_in <- final_df[final_df$lineage == "pancreas", ]
 
 
-#calculate the mode (most frequent mutation)
-calculate_mode <- function(x) {
-  uniqx <- unique(na.omit(x))
-  uniqx[which.max(tabulate(match(x, uniqx)))]
-}
 
-#mode of final_df
-calculate_mode(final_df$Hugo_Symbol)
+#list top 5 common mutations
+sort(table(final_df$Hugo_Symbol),decreasing=TRUE)[1:5]
 
-xx <- sort(table(final_df$Hugo_Symbol),decreasing=TRUE)[1:5]
-xx
+sort(table(colo_in$Hugo_Symbol),decreasing=TRUE)[1:5]
+sort(table(panc_in$Hugo_Symbol),decreasing=TRUE)[1:5]
 
-
-#mode of panc_in
-calculate_mode(panc_in$Hugo_Symbol)
-
-xx <- sort(table(panc_in$Hugo_Symbol),decreasing=TRUE)[1:5]
-xx
 
 #
 below_avg_panc_in <- panc_in[panc_in$Abs.IC50 < mean(panc_in$Abs.IC50), ]
 
 
-#most frequent mutations
-calculate_mode(below_avg_panc_in$Hugo_Symbol)
-
-#or top 3 frequence mutations
 xx <- sort(table(below_avg_panc_in$Hugo_Symbol),decreasing=TRUE)[1:5]
 xx
 
