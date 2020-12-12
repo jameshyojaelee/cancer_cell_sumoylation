@@ -1,4 +1,6 @@
-# CRISPR Gene Knockout Effect
+#GWAS on Sumoylation
+
+## CRISPR Gene Knockout Effect
 
 ## [Main_Gene_Effect.R](https://github.com/jameshyojaelee/Gene_knockout_effect/raw/main/Main_Gene_effect.R)
 Main R script with source code <br />
