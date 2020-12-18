@@ -1,4 +1,6 @@
-# CRISPR Gene Knockout Effect
+# GWAS and Sumoylation-related Cancer
+
+# 1. CRISPR Gene Knockout Effect
 
 ## [Main_Gene_Effect.R](https://github.com/jameshyojaelee/Gene_knockout_effect/raw/main/Main_Gene_effect.R)
 Main R script with source code <br />
@@ -23,7 +25,7 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 ## UBA2 gene knockout effect across lineage 
 ### **The term lineage is used here to describe different cancer cell lines such as colorectal and pancreatic cancer.**
 ![alt text](https://github.com/jameshyojaelee/gene_knockout_effect/blob/main/UBA2_gene_KO_effect_per_lineage.png)
-<br />
+
 <br />
 <br />
 
@@ -34,6 +36,12 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 <br />
 <br />
 <br />
+<br />
+
+# 2. Sumoylation Inhibition using TAK-981
+TAK-981 is a novel sumoylation inhibitor created by Takeda. It is allowed for lab uses and is currently going through human trials. 
+>[Clinical Trials info](https://clinicaltrials.gov/ct2/show/NCT03648372)
+
 <br />
 
 ## Pathway Analysis
