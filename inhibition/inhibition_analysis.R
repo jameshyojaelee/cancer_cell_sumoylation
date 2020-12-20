@@ -1,6 +1,6 @@
 #import mutation info
-ccl_mut <- read.csv("C:/Users/james/Desktop/Gene_knockout/data/CCLE_mutations.csv") 
-cclID <- read.csv("C:/Users/james/Desktop/Gene_knockout/data/sample_info.csv") #list of all cell lines, ID and lineage
+ccl_mut <- read.csv("C:/Users/james/Desktop/Sumoylation_Analysis/data/CCLE_mutations.csv") 
+cclID <- read.csv("C:/Users/james/Desktop/Sumoylation_Analysis/data/sample_info.csv") #list of all cell lines, ID and lineage
 inhibition <- read.csv("inhibition/inhibition_data.csv", fileEncoding="UTF-8-BOM") #inhibition data 
 
 #dataframe with the cancer cell line names
@@ -21,6 +21,8 @@ mut_df <- merge(x = ccl_df,
 
 #eliminate silent mutation
 mut_df <- mut_df[mut_df$Variant_Classification != "Silent", ]
+
+#extract colorectal and pancreatic cancer only
 mut_df <- mut_df[which(mut_df$lineage == "colorectal" | mut_df$lineage == "pancreas"), ]
 
 
@@ -47,16 +49,23 @@ sort(table(colo_in$Hugo_Symbol),decreasing=TRUE)[1:5]
 sort(table(panc_in$Hugo_Symbol),decreasing=TRUE)[1:5]
 
 
-#
-below_avg_panc_in <- panc_in[panc_in$Abs.IC50 < mean(panc_in$Abs.IC50), ]
 
 
-xx <- sort(table(below_avg_panc_in$Hugo_Symbol),decreasing=TRUE)[1:5]
-xx
-
-nrow(below_avg_panc_in[below_avg_panc_in$Hugo_Symbol == "TP53", ])
 
 
-below_avg_panc_in <- panc_in[panc_in$AUC < mean(panc_in$AUC), ]
+##############################  Pancreatic Cancer ############################## 
+
+#common mutation with below average IC50
+below_avg_panc_IC50 <- panc_in[panc_in$Abs.IC50 < mean(panc_in$Abs.IC50), ]
+
+panc_top5_mut_IC50 <- sort(table(below_avg_panc_IC50$Hugo_Symbol),decreasing=TRUE)[1:5]
+panc_top5_mut_IC50
 
 
+#common mutation with below average AUC value
+below_avg_panc_AUC <- panc_in[panc_in$AUC < mean(panc_in$AUC), ]
+panc_top5_mut_AUC <- sort(table(below_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)[1:5]
+panc_top5_mut_AUC
+
+
+################################################################################
