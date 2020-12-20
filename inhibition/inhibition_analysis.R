@@ -36,6 +36,7 @@ colnames(inhibition)[which(names(inhibition) == "cell")] <- "ccl"
 final_df <- merge(x = mut_df,
                   y = inhibition,
                   by = "ccl")
+final_df <- unique(final_df)
 
 colo_in <- final_df[final_df$lineage == "colorectal", ]
 panc_in <- final_df[final_df$lineage == "pancreas", ]
@@ -45,27 +46,36 @@ panc_in <- final_df[final_df$lineage == "pancreas", ]
 #list top 5 common mutations
 sort(table(final_df$Hugo_Symbol),decreasing=TRUE)[1:5]
 
+#divide them into two groups: colorectal and pancreatic
 sort(table(colo_in$Hugo_Symbol),decreasing=TRUE)[1:5]
 sort(table(panc_in$Hugo_Symbol),decreasing=TRUE)[1:5]
 
 
 
-
-
-
-##############################  Pancreatic Cancer ############################## 
+#####################################  Pancreatic Cancer ##################################### 
 
 #common mutation with below average IC50
 below_avg_panc_IC50 <- panc_in[panc_in$Abs.IC50 < mean(panc_in$Abs.IC50), ]
 
 panc_top5_mut_IC50 <- sort(table(below_avg_panc_IC50$Hugo_Symbol),decreasing=TRUE)[1:5]
 panc_top5_mut_IC50
-
+# TP53 KRAS TTN KRT17 MT-ND5 
 
 #common mutation with below average AUC value
 below_avg_panc_AUC <- panc_in[panc_in$AUC < mean(panc_in$AUC), ]
 panc_top5_mut_AUC <- sort(table(below_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)[1:5]
 panc_top5_mut_AUC
+#same as the IC50 result
+
+# statistical significance of difference in IC50 values between cells with that mutation and cells without the mutation
+?t.test
+TP53 <- below_avg_panc_IC50[below_avg_panc_IC50$Hugo_Symbol=="TP53", ]
+NOT_TP53 <- below_avg_panc_IC50[below_avg_panc_IC50$Hugo_Symbol!="TP53", ]
+
+t.test(TP53$Abs.IC50, )
 
 
-################################################################################
+
+
+
+##############################################################################################
