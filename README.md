@@ -43,6 +43,7 @@ TAK-981 is a novel sumoylation inhibitor created by Takeda. It is allowed for la
 >[Clinical Trials info](https://clinicaltrials.gov/ct2/show/NCT03648372)
 
 <br />
+<br />
 
 ## Pathway Analysis
 ### Example with HUWE1 (found in colorectal cancer mutation analysis) 
