@@ -1,7 +1,7 @@
 #import mutation info
 ccl_mut <- read.csv("C:/Users/james/Desktop/Sumoylation_Analysis/data/CCLE_mutations.csv") 
 cclID <- read.csv("C:/Users/james/Desktop/Sumoylation_Analysis/data/sample_info.csv") #list of all cell lines, ID and lineage
-inhibition <- read.csv("inhibition/inhibition_data.csv", fileEncoding="UTF-8-BOM") #inhibition data 
+inhibition <- read.csv("inhibition_data.csv", fileEncoding="UTF-8-BOM") #inhibition data 
 
 #dataframe with the cancer cell line names
 ccl_df <- data.frame(ID = cclID$DepMap_ID, ccl = cclID$stripped_cell_line_name, lineage = cclID$lineage)
@@ -67,13 +67,24 @@ panc_top5_mut_AUC <- sort(table(below_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)
 panc_top5_mut_AUC
 #same as the IC50 result
 
-# statistical significance of difference in IC50 values between cells with that mutation and cells without the mutation
+# statistical significance of difference in AUC values between cells with that mutation and cells without the mutation
 ?t.test
-TP53 <- below_avg_panc_IC50[below_avg_panc_IC50$Hugo_Symbol=="TP53", ]
-NOT_TP53 <- below_avg_panc_IC50[below_avg_panc_IC50$Hugo_Symbol!="TP53", ]
+TP53 <- below_avg_panc_AUC[below_avg_panc_AUC$Hugo_Symbol=="TP53", ]
+NOT_TP53 <- below_avg_panc_AUC[below_avg_panc_AUC$Hugo_Symbol!="TP53", ]
 
-t.test(TP53$Abs.IC50, )
 
+
+
+ttest_df <- below_avg_panc_IC50
+ttest_df$Hugo_Symbol[ttest_df$Hugo_Symbol == "TP53"] <- "Has Mut"
+ttest_df$Hugo_Symbol[ttest_df$Hugo_Symbol != "TP53"] <- "Lacks Mut"
+
+
+
+
+stats <- t.test(Abs.IC50 ~ Hugo_Symbol, data=below_avg_panc_IC50)
+
+stats$p.value
 
 
 
