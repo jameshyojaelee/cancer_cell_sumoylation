@@ -20,7 +20,7 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 
 >[CCLE_mutations.csv](https://ndownloader.figshare.com/files/25494419)
 
-<br />
+<br /><br /><br />
 
 ## UBA2 gene knockout effect across lineage 
 ### **The term lineage is used here to describe different cancer cell lines such as colorectal and pancreatic cancer.**
