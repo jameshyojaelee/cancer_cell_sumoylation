@@ -20,7 +20,7 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 
 >[CCLE_mutations.csv](https://ndownloader.figshare.com/files/25494419)
 
-<br />
+<br /><br /><br />
 
 ## UBA2 gene knockout effect across lineage 
 ### **The term lineage is used here to describe different cancer cell lines such as colorectal and pancreatic cancer.**
@@ -42,6 +42,7 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 TAK-981 is a novel sumoylation inhibitor created by Takeda. It is allowed for lab uses and is currently going through human trials. 
 >[Clinical Trials info](https://clinicaltrials.gov/ct2/show/NCT03648372)
 
+<br />
 <br />
 
 ## Pathway Analysis
