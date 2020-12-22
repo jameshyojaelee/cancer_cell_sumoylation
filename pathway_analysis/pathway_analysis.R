@@ -12,9 +12,9 @@ columns(org.Hs.eg.db)
 
 
 #import mutation info
-ccl_mut <- read.csv("C:/Users/james/Desktop/Gene_knockout/data/CCLE_mutations.csv") 
-cclID <- read.csv("C:/Users/james/Desktop/Gene_knockout/data/sample_info.csv") #list of all cell lines, ID and lineage
-inhibition <- read.csv("inhibition/inhibition_data.csv", fileEncoding="UTF-8-BOM") #inhibition data 
+ccl_mut <- read.csv("C:/Users/james/Desktop/Sumoylation_Analysis/data/CCLE_mutations.csv") 
+cclID <- read.csv("C:/Users/james/Desktop/Sumoylation_Analysis/data/sample_info.csv") #list of all cell lines, ID and lineage
+inhibition <- read.csv("C:/Users/james/Desktop/Sumoylation_Analysis/project/inhibition/inhibition_data.csv", fileEncoding="UTF-8-BOM") #inhibition data 
 
 #dataframe with the cancer cell line names
 ccl_df <- data.frame(ID = cclID$DepMap_ID, ccl = cclID$stripped_cell_line_name, lineage = cclID$lineage)
