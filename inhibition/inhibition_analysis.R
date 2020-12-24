@@ -25,6 +25,9 @@ mut_df <- merge(x = ccl_df,
 #eliminate silent mutation
 mut_df <- mut_df[mut_df$Variant_Classification != "Silent", ]
 
+nrow(distinct(mut_df, ccl, .keep_all = TRUE))
+
+
 #extract colorectal and pancreatic cancer only
 mut_df <- mut_df[which(mut_df$lineage == "colorectal" | mut_df$lineage == "pancreas"), ]
 
@@ -34,15 +37,34 @@ inhibition$cell <- gsub(" ", "", inhibition$cell)
 inhibition$cell <- gsub("-", "", inhibition$cell)
 inhibition$cell <- gsub("\\.", "", inhibition$cell) #to remove dot, add 2 backslashes
 
+inhibition$cell <- toupper(inhibition$cell)
+
+
 colnames(inhibition)[which(names(inhibition) == "cell")] <- "ccl"
+
+class(mut_df$ccl)
+mut_df$ccl <- as.character(mut_df$ccl)
+
+class(inhibition$ccl)
+
 
 final_df <- merge(x = mut_df,
                   y = inhibition,
                   by = "ccl")
+
 final_df <- unique(final_df)
 
+nrow(distinct(final_df, ccl, .keep_all = TRUE))
+
+
 colo_in <- final_df[final_df$lineage == "colorectal", ]
+
+nrow(distinct(colo_in, ccl, .keep_all = TRUE))
+
+
 panc_in <- final_df[final_df$lineage == "pancreas", ]
+
+nrow(distinct(panc_in, ccl, .keep_all = TRUE))
 
 
 
@@ -50,32 +72,30 @@ panc_in <- final_df[final_df$lineage == "pancreas", ]
 sort(table(final_df$Hugo_Symbol),decreasing=TRUE)[1:5]
 
 #divide them into two groups: colorectal and pancreatic
-sort(table(colo_in$Hugo_Symbol),decreasing=TRUE)[1:5]
-sort(table(panc_in$Hugo_Symbol),decreasing=TRUE)[1:5]
+sort(table(colo_in$Hugo_Symbol),decreasing=TRUE)[1:10]
+sort(table(panc_in$Hugo_Symbol),decreasing=TRUE)[1:10]
 
 
 
 ##################################################  Pancreatic Cancer ################################################## 
 
-#common mutation with below average IC50
-below_avg_panc_IC50 <- panc_in[panc_in$Abs.IC50 < mean(panc_in$Abs.IC50), ]
-
-panc_top5_mut_IC50 <- sort(table(below_avg_panc_IC50$Hugo_Symbol),decreasing=TRUE)[1:10]
-panc_top5_mut_IC50
-# TP53 KRAS TTN KRT17 MT-ND5 
 
 #common mutation with below average AUC value
-below_avg_panc_AUC <- panc_in[panc_in$AUC < mean(panc_in$AUC), ]
+below_avg_panc_AUC <- panc_in[panc_in$AUC < 400, ]
 panc_top5_mut_AUC <- sort(table(below_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)[1:10]
 panc_top5_mut_AUC
 #same as the IC50 result
 
-
-pan_ccl <- distinct(below_avg_panc_IC50, ccl, .keep_all = TRUE)
-nrow(pan_ccl)
-pan_ccl <- distinct(below_avg_panc_AUC, ccl, .keep_all = TRUE)
-nrow(pan_ccl)
+nrow(distinct(below_avg_panc_AUC, ccl, .keep_all = TRUE))
 # statistical significance of difference in AUC values between cells with that mutation and cells without the mutation
+
+above_avg_panc_AUC <- panc_in[panc_in$AUC > 400, ]
+above_avg <- sort(table(above_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)[1:10]
+above_avg
+
+nrow(distinct(above_avg_panc_AUC, ccl, .keep_all = TRUE))
+
+
 
 ttest_df <- below_avg_panc_IC50
 ttest_df$Hugo_Symbol <- as.character(ttest_df$Hugo_Symbol)
@@ -100,7 +120,7 @@ below_avg_colo_IC50 <- colo_in[colo_in$Abs.IC50 < mean(colo_in$Abs.IC50), ]
 
 colo_top5_mut_IC50 <- sort(table(below_avg_colo_IC50$Hugo_Symbol),decreasing=TRUE)[1:10]
 colo_top5_mut_IC50
-# TP53 KRAS TTN KRT17 MT-ND5 
+# TP53 KRAS TTN KRT17 MT-ND5  
 
 #number of cell lines with below average IC50
 nrow(distinct(below_avg_colo_IC50, ccl, .keep_all = TRUE))

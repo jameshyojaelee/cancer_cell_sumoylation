@@ -1,30 +1,39 @@
 
 Pancreatic cancer (7 out of 13 cell lines have below average IC50, 5 out of 13 have below average AUC)
 
-IC50
-KRAS   TP53  MUC5B  EPPK1 MT-ND4 MT-ND5  MUC16    TTN  LAMA1  LRP1B 
+IC50 
+KRAS   TP53  MUC5B  EPPK1 MT-ND4 MT-ND5  MUC16   TTN  LAMA1  LRP1B 
  7      7      6      4      4      4      4      4      3      3 
 
-AUC
-    KRAS     TP53    LAMA1    LRP1B   MT-ND4     NBR1      TTN   
-       5        5        3        3        3        3        3  
+AUC 
+KRAS     TP53    LAMA1    LRP1B   MT-ND4     NBR1      TTN   ATP2B3      ATR CACNA2D1 
+  5        5        3        3        3        3        3        2        2        2 
 
 
 
 
-Colorectal cancer (8 out of 18 cell lines have below average IC50, 9 out of 13 have below average AUC)
+Colorectal cancer (8 out of 18 cell lines have below average IC50, 9 out of 18 have below average AUC)
 
-IC50
+IC50 
 TTN      APC    MUC16     PCLO KIAA1549     LRP1   MYCBP2    OBSCN    UNC80     WNK2 
 13       11        7        7        6        6        6        6        6        6 
 
-AUC
-TTN      APC     PCLO    MUC16    OBSCN    CMYA5      DST KIAA1549     KRAS     LRP1 
-14       12        8        7        7        6        6        6        6        6 
-
-
-
+AUC 
+TTN      APC     PCLO    MUC16    OBSCN    CMYA5    DST   KIAA1549     KRAS     LRP1 
+14       12        8        7        7        6      6        6        6        6 
 
 
 Sample size small, t-test not possible
 	-therefore need a universally effective threshold for both IC50 and AUC values. 
+
+
+
+Common in both
+KRAS, TTN, MUC16 (MUC5B in panc), LRP1(LRP1B), 
+
+
+
+
+Mucin genes (MUC5B, MUC16)
+
+LRP1 promotes cancer cell invasion and migration 
