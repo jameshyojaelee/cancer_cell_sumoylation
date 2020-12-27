@@ -26,11 +26,12 @@ mut_df <- merge(x = ccl_df,
 mut_df <- mut_df[mut_df$Variant_Classification != "Silent", ]
 
 nrow(distinct(mut_df, ccl, .keep_all = TRUE))
-
+#total of 1694 unique cell lines
 
 #extract colorectal and pancreatic cancer only
-mut_df <- mut_df[which(mut_df$lineage == "colorectal" | mut_df$lineage == "pancreas"), ]
-
+#mut_df <- mut_df[which(mut_df$lineage == "colorectal" | mut_df$lineage == "pancreas"), ]
+#nrow(distinct(mut_df, ccl, .keep_all = TRUE))
+#total of 130 unique colorectal/pancreatic cell lines
 
 #now process inhibition data by eliminating all spaces and special characters
 inhibition$cell <- gsub(" ", "", inhibition$cell)
@@ -42,29 +43,27 @@ inhibition$cell <- toupper(inhibition$cell)
 
 colnames(inhibition)[which(names(inhibition) == "cell")] <- "ccl"
 
-class(mut_df$ccl)
-mut_df$ccl <- as.character(mut_df$ccl)
-
-class(inhibition$ccl)
-
 
 final_df <- merge(x = mut_df,
                   y = inhibition,
                   by = "ccl")
 
 final_df <- unique(final_df)
-
+distinct(final_df, ccl, .keep_all = TRUE)
 nrow(distinct(final_df, ccl, .keep_all = TRUE))
+#30 unique cell lines
+#DLD1 is the only cell line that doesn't exist in the BROAD institute's dataset
+#COLO741 is a colon carcinoma and therefore categorized as "skin" cancer. 
 
+#all the unique cell lines
+distinct(final_df, lineage)
 
 colo_in <- final_df[final_df$lineage == "colorectal", ]
+nrow(distinct(colo_in, ccl))
 
-nrow(distinct(colo_in, ccl, .keep_all = TRUE))
-
-
-panc_in <- final_df[final_df$lineage == "pancreas", ]
-
-nrow(distinct(panc_in, ccl, .keep_all = TRUE))
+#need to include skin cancer because of COLO741 being categorized as colon carcinoma
+panc_in <- final_df[final_df$lineage == "pancreas" | final_df$lineage == "skin", ]
+nrow(distinct(panc_in, ccl))
 
 
 
@@ -82,30 +81,71 @@ sort(table(panc_in$Hugo_Symbol),decreasing=TRUE)[1:10]
 
 #common mutation with below average AUC value
 below_avg_panc_AUC <- panc_in[panc_in$AUC < 400, ]
-panc_top5_mut_AUC <- sort(table(below_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)[1:10]
-panc_top5_mut_AUC
-#same as the IC50 result
+nrow(distinct(below_avg_panc_AUC, ccl))
+#list the 10 most common mutations
+panc_below_avg <- sort(table(below_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)[1:10]
+panc_below_avg
 
-nrow(distinct(below_avg_panc_AUC, ccl, .keep_all = TRUE))
+
+
+#common mutation with above average AUC value
+above_avg_panc_AUC <- panc_in[panc_in$AUC >= 400, ]
+nrow(distinct(above_avg_panc_AUC, ccl))
+#list the 10 most common mutations
+panc_above_avg <- sort(table(above_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)[1:10]
+panc_above_avg
+
+
+
+
 # statistical significance of difference in AUC values between cells with that mutation and cells without the mutation
 
-above_avg_panc_AUC <- panc_in[panc_in$AUC > 400, ]
-above_avg <- sort(table(above_avg_panc_AUC$Hugo_Symbol),decreasing=TRUE)[1:10]
-above_avg
-
-nrow(distinct(above_avg_panc_AUC, ccl, .keep_all = TRUE))
-
-
-
-ttest_df <- below_avg_panc_IC50
+ttest_df <- panc_in
 ttest_df$Hugo_Symbol <- as.character(ttest_df$Hugo_Symbol)
+ttest_df$Hugo_Symbol[ttest_df$Hugo_Symbol != "TP53"] <- "Lacks Mut"
 ttest_df$Hugo_Symbol[ttest_df$Hugo_Symbol == "TP53"] <- "Has Mut"
-ttest_df$Hugo_Symbol[ttest_df$Hugo_Symbol != "Has Mut"] <- "Lacks Mut"
+distinct(ttest_df, Hugo_Symbol)
+
+t <- list()
+t[[1]] <- t.test(AUC ~ Hugo_Symbol, data = ttest_df)
+
+tt <- sapply(t, function(x) {
+          c(x$estimate[1],
+            x$estimate[2],
+            ci.lower = x$conf.int[1],
+            ci.upper = x$conf.int[2],
+            p.value = x$p.value)
+        }
+      )
+
+#create a function to repeat t-test for other genes
+
+ttest <- function(G){
+  ttest_df <- panc_in
+  ttest_df$Hugo_Symbol <- as.character(ttest_df$Hugo_Symbol)
+  ttest_df$Hugo_Symbol[ttest_df$Hugo_Symbol != G] <- "Lacks Mut"
+  ttest_df$Hugo_Symbol[ttest_df$Hugo_Symbol == G] <- "Has Mut"
+  t.test(AUC ~ Hugo_Symbol, data = ttest_df)
+}
+
+ttest("KRAS")
 
 
-stats <- t.test(Abs.IC50 ~ Hugo_Symbol, data = below_avg_panc_IC50)
+#create dataframe with top 10 mutations (with below 400 AUC)
+panc_below_avg_df <- as.data.frame(panc_below_avg, stringsAsFactors=FALSE)
+colnames(panc_below_avg_df) <- c('mutation', 'freq')
 
-stats$p.value
+panc_below_avg_df$mutated_mean <- NA
+panc_below_avg_df$others_mean <- NA
+panc_below_avg_df$p.value <- NA
+
+
+for (i in nrow(panc_below_avg_df)) {
+  t <- ttest(panc_below_avg_df$mutation[i])
+  panc_below_avg_df$mutated_mean <- 
+}
+
+
 
 ########################################################################################################################
 

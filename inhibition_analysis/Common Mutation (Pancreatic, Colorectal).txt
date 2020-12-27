@@ -1,14 +1,16 @@
 
-Pancreatic cancer (7 out of 13 cell lines have below average IC50, 5 out of 13 have below average AUC)
+Pancreatic cancer 
 
-IC50 
-KRAS   TP53  MUC5B  EPPK1 MT-ND4 MT-ND5  MUC16   TTN  LAMA1  LRP1B 
- 7      7      6      4      4      4      4      4      3      3 
+> panc_below_avg
 
-AUC 
-KRAS     TP53    LAMA1    LRP1B   MT-ND4     NBR1      TTN   ATP2B3      ATR CACNA2D1 
-  5        5        3        3        3        3        3        2        2        2 
+  TP53          KRAS           TTN         EPPK1         LRP1B         BRCA2          CHUK CTD-3193O13.9         DNAH9 LAMA1
+   8             7             6             4             4             3             3             3             3    3
+            
 
+> panc_above_avg
+
+  TP53   KRAS    TTN  MUC16  MUC5B ABCA13 ARID1A FAM47B MT-ND5  NIPBL 
+     6      5      5      4      4      3      3      3      3      3 
 
 
 
