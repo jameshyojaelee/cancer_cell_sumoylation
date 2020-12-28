@@ -3,8 +3,8 @@ Pancreatic cancer
 
 > panc_below_avg
 
-  TP53          KRAS           TTN         EPPK1         LRP1B         BRCA2          CHUK CTD-3193O13.9         DNAH9 LAMA1
-   8             7             6             4             4             3             3             3             3    3
+  TP53          KRAS           TTN         EPPK1         LRP1B         BRCA2          CHUK CTD-3193O13.9     DNAH9 LAMA1
+   8             7             6             4             4             3             3             3          3    3
             
 
 > panc_above_avg
@@ -14,19 +14,18 @@ Pancreatic cancer
 
 
 
-Colorectal cancer (8 out of 18 cell lines have below average IC50, 9 out of 18 have below average AUC)
+Colorectal cancer 
 
-IC50 
-TTN      APC    MUC16     PCLO KIAA1549     LRP1   MYCBP2    OBSCN    UNC80     WNK2 
-13       11        7        7        6        6        6        6        6        6 
+> colo_below_avg
 
-AUC 
-TTN      APC     PCLO    MUC16    OBSCN    CMYA5    DST   KIAA1549     KRAS     LRP1 
-14       12        8        7        7        6      6        6        6        6 
+     TTN      APC      DST     FAT4    OBSCN KIAA1109     LRP1   MYCBP2     PCLO  PKHD1L1 
+      13       10        8        8        8        7        7        7        7        7 
 
+> colo_above_avg
 
-Sample size small, t-test not possible
-	-therefore need a universally effective threshold for both IC50 and AUC values. 
+   TTN    APC  LRP1B  MUC16  SYNE1  OBSCN ABCA13  AKAP9    DST  GPR98 
+    22     13     11     11     11      9      8      8      8      8 
+
 
 
 
