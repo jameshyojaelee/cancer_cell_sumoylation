@@ -156,14 +156,14 @@ write.csv(panc_below_avg_df, "PANC_mutation.csv", row.names=FALSE)
 ##################################################  Colorectal Cancer ################################################## 
 
 #common mutation with below average AUC value
-below_avg_colo_AUC <- colo_in[colo_in$AUC < 400, ]
+below_avg_colo_AUC <- colo_in[colo_in$AUC < 350, ]
 nrow(distinct(below_avg_colo_AUC, ccl))
 #list the 10 most common mutations
 colo_below_avg <- sort(table(below_avg_colo_AUC$Hugo_Symbol),decreasing=TRUE)[1:10]
 colo_below_avg
 
 #common mutation with above average AUC value
-above_avg_colo_AUC <- colo_in[colo_in$AUC >= 400, ]
+above_avg_colo_AUC <- colo_in[colo_in$AUC >= 350, ]
 nrow(distinct(above_avg_colo_AUC, ccl))
 #list the 10 most common mutations
 colo_above_avg <- sort(table(above_avg_colo_AUC$Hugo_Symbol),decreasing=TRUE)[1:10]
@@ -189,16 +189,167 @@ for (i in 1:nrow(colo_below_avg_df)) {
   colo_below_avg_df$others_AUC_mean[i] <- tsum[2]
   colo_below_avg_df$p.value[i] <- round(tsum[3], digits=3)
 }
-
+colo_below_avg_df
 write.csv(colo_below_avg_df, "COLO_mutation.csv", row.names=FALSE)
 
 
 
 ######################################################################################################################
 
-panc_below_avg_df
 
-colo_below_avg_df
+# Additional mutation analysis
+# 1. RAD
+# 2. XRCC
+# 3. BRCA
+# 4. ATR
+
+
+#create subset for RAD genes within pancreatic cells. 
+#subset of any gene that starts with RAD
+panc_RAD <- droplevels(panc_in[grepl("^RAD", panc_in$Hugo_Symbol), ])
+mut_list <- panc_RAD$Hugo_Symbol
+
+panc_RAD_ttest <- panc_in
+panc_RAD_ttest$Hugo_Symbol <- as.character(panc_RAD_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+panc_RAD_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_RAD_ttest$Hugo_Symbol)] <- "RAD"
+panc_RAD_ttest$Hugo_Symbol[panc_RAD_ttest$Hugo_Symbol != "RAD"] <- "Lacks Mut"
+distinct(panc_RAD_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_RAD_ttest)
 
 
 
+#BRCA in pancreatic
+panc_BRCA <- droplevels(panc_in[grepl("^BRCA", panc_in$Hugo_Symbol), ])
+mut_list <- panc_BRCA$Hugo_Symbol
+
+panc_BRCA_ttest <- panc_in
+panc_BRCA_ttest$Hugo_Symbol <- as.character(panc_BRCA_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+panc_BRCA_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_BRCA_ttest$Hugo_Symbol)] <- "BRCA"
+panc_BRCA_ttest$Hugo_Symbol[panc_BRCA_ttest$Hugo_Symbol != "BRCA"] <- "Lacks Mut"
+distinct(panc_BRCA_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_BRCA_ttest)
+
+
+
+#MUC in pancreatic
+panc_MUC <- droplevels(panc_in[grepl("^MUC", panc_in$Hugo_Symbol), ])
+mut_list <- as.vector(panc_MUC$Hugo_Symbol)
+
+panc_MUC_ttest <- panc_in
+panc_MUC_ttest$Hugo_Symbol <- as.character(panc_MUC_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+panc_MUC_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_MUC_ttest$Hugo_Symbol)] <- "MUC"
+panc_MUC_ttest$Hugo_Symbol[panc_MUC_ttest$Hugo_Symbol != "MUC"] <- "Lacks Mut"
+distinct(panc_MUC_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_MUC_ttest)
+
+
+
+
+
+
+
+
+
+##############
+
+
+#RAD in colorectal
+colo_RAD <- colo_in[grepl("^RAD", colo_in$Hugo_Symbol), ]
+mut_list <- as.vector(colo_RAD$Hugo_Symbol)
+#remove RADIL since it's not a RAD gene
+mut_list <- mut_list[mut_list != "RADIL"]
+
+colo_RAD_ttest <- colo_in
+colo_RAD_ttest$Hugo_Symbol <- as.character(colo_RAD_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+colo_RAD_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), colo_RAD_ttest$Hugo_Symbol)] <- "RAD"
+colo_RAD_ttest$Hugo_Symbol[colo_RAD_ttest$Hugo_Symbol != "RAD"] <- "Lacks Mut"
+distinct(colo_RAD_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=colo_RAD_ttest)
+
+
+
+#XRCC in colorectal 
+colo_XRCC <- colo_in[grepl("^XRCC", colo_in$Hugo_Symbol), ]
+mut_list <- as.vector(colo_XRCC$Hugo_Symbol)
+
+colo_XRCC_ttest <- colo_in
+colo_XRCC_ttest$Hugo_Symbol <- as.character(colo_XRCC_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+colo_XRCC_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), colo_XRCC_ttest$Hugo_Symbol)] <- "XRCC"
+colo_XRCC_ttest$Hugo_Symbol[colo_XRCC_ttest$Hugo_Symbol != "XRCC"] <- "Lacks Mut"
+distinct(colo_XRCC_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=colo_XRCC_ttest)
+
+
+
+#ATR in colorectal 
+colo_ATR <- colo_in[grepl("^ATR", colo_in$Hugo_Symbol), ]
+mut_list <- as.vector(colo_ATR$Hugo_Symbol)
+
+#delete ATRNL1 since its not a ATR gene
+mut_list <- mut_list[mut_list != "ATRNL1"]
+
+#
+mut_list <- mut_list[mut_list != "ATRN"]
+
+#
+mut_list <- mut_list[mut_list != "ATRX"]
+
+colo_ATR_ttest <- colo_in
+colo_ATR_ttest$Hugo_Symbol <- as.character(colo_ATR_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+colo_ATR_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), colo_ATR_ttest$Hugo_Symbol)] <- "ATR"
+colo_ATR_ttest$Hugo_Symbol[colo_ATR_ttest$Hugo_Symbol != "ATR"] <- "Lacks Mut"
+distinct(colo_ATR_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=colo_ATR_ttest)
+
+
+
+
+#BRCA in colorectal 
+colo_BRCA <- colo_in[grepl("^BRCA", colo_in$Hugo_Symbol), ]
+mut_list <- as.vector(colo_BRCA$Hugo_Symbol)
+
+
+colo_BRCA_ttest <- colo_in
+colo_BRCA_ttest$Hugo_Symbol <- as.character(colo_BRCA_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+colo_BRCA_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), colo_BRCA_ttest$Hugo_Symbol)] <- "BRCA"
+colo_BRCA_ttest$Hugo_Symbol[colo_BRCA_ttest$Hugo_Symbol != "BRCA"] <- "Lacks Mut"
+distinct(colo_BRCA_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=colo_BRCA_ttest)
+
+
+
+#MUC in colorectal 
+colo_MUC <- colo_in[grepl("^MUC", colo_in$Hugo_Symbol), ]
+mut_list <- as.vector(colo_MUC$Hugo_Symbol)
+
+
+colo_MUC_ttest <- colo_in
+colo_MUC_ttest$Hugo_Symbol <- as.character(colo_MUC_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+colo_MUC_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), colo_MUC_ttest$Hugo_Symbol)] <- "MUC"
+colo_MUC_ttest$Hugo_Symbol[colo_MUC_ttest$Hugo_Symbol != "MUC"] <- "Lacks Mut"
+distinct(colo_MUC_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=colo_MUC_ttest)
