@@ -27,7 +27,6 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 ![alt text](https://github.com/jameshyojaelee/gene_knockout_effect/blob/main/UBA2_gene_KO_effect_per_lineage.png)
 
 <br />
-<br />
 
 ## Mutation Analysis
 ### Example with colorectal cancer
