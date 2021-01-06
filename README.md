@@ -44,6 +44,9 @@ TAK-981 is a novel sumoylation inhibitor created by Takeda. It is allowed for la
 <br />
 <br />
 
+TAK-981 inhibition experiment result: https://github.com/jameshyojaelee/cancer_cell_sumoylation/blob/main/inhibition_analysis/inhibition%20results.xlsx
+
+
 ## Pathway Analysis
 ### Example with HUWE1 (found in colorectal cancer mutation analysis) 
 ![alt text](https://github.com/jameshyojaelee/Gene_knockout_effect/blob/main/pathway_analysis/HUWE1/hsa04120.png)
