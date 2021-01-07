@@ -171,7 +171,7 @@ colo_above_avg
 
 
 #use ttest function that we created during pancreas analysis
-ttest("TTN", colo_in)
+ttest("KRAS", colo_in)
 
 #create dataframe with top 10 mutations (with below 400 AUC)
 colo_below_avg_df <- as.data.frame(colo_below_avg, stringsAsFactors=FALSE)
@@ -252,14 +252,38 @@ distinct(panc_MUC_ttest, Hugo_Symbol)
 t.test(AUC ~ Hugo_Symbol, data=panc_MUC_ttest)
 
 
+#MYC in pancreatic
+panc_MYC <- droplevels(panc_in[grepl("^MYC", panc_in$Hugo_Symbol), ])
+mut_list <- as.vector(panc_MYC$Hugo_Symbol)
+
+panc_MYC_ttest <- panc_in
+panc_MYC_ttest$Hugo_Symbol <- as.character(panc_MYC_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+panc_MYC_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_MYC_ttest$Hugo_Symbol)] <- "MYC"
+panc_MYC_ttest$Hugo_Symbol[panc_MYC_ttest$Hugo_Symbol != "MYC"] <- "Lacks Mut"
+distinct(panc_MYC_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_MYC_ttest)
+
+
+#FANC in pancreatic
+panc_FANC <- droplevels(panc_in[grepl("^FANC", panc_in$Hugo_Symbol), ])
+mut_list <- as.vector(panc_FANC$Hugo_Symbol)
+
+panc_FANC_ttest <- panc_in
+panc_FANC_ttest$Hugo_Symbol <- as.character(panc_FANC_ttest$Hugo_Symbol)
+
+#change all RAD family genes to RAD
+panc_FANC_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_FANC_ttest$Hugo_Symbol)] <- "FANC"
+panc_FANC_ttest$Hugo_Symbol[panc_FANC_ttest$Hugo_Symbol != "FANC"] <- "Lacks Mut"
+distinct(panc_FANC_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_FANC_ttest)
 
 
 
-
-
-
-
-##############
+############################################################################################################
 
 
 #RAD in colorectal
