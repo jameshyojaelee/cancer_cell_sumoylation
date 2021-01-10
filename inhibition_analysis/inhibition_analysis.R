@@ -286,6 +286,55 @@ t.test(AUC ~ Hugo_Symbol, data=panc_FANC_ttest)
 
 
 
+#Include other genes in BRCA group and re-do t-test
+
+#BRCA + ATR
+panc_BRCA <- droplevels(panc_in[grepl("^BRCA", panc_in$Hugo_Symbol), ])
+mut_list <- panc_BRCA$Hugo_Symbol
+
+panc_BRCA_ttest <- panc_in
+panc_BRCA_ttest$Hugo_Symbol <- as.character(panc_BRCA_ttest$Hugo_Symbol)
+
+panc_BRCA_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_BRCA_ttest$Hugo_Symbol)] <- "Has_Mut"
+panc_BRCA_ttest$Hugo_Symbol[panc_BRCA_ttest$Hugo_Symbol == "ATR"] <- "Has_Mut"
+panc_BRCA_ttest$Hugo_Symbol[panc_BRCA_ttest$Hugo_Symbol != "Has_Mut"] <- "Lacks Mut"
+distinct(panc_BRCA_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_BRCA_ttest)
+
+
+#BRCA + RAD family
+panc_BRCA <- droplevels(panc_in[grepl("^BRCA", panc_in$Hugo_Symbol), ])
+mut_list <- panc_BRCA$Hugo_Symbol
+
+panc_BRCA_ttest <- panc_in
+panc_BRCA_ttest$Hugo_Symbol <- as.character(panc_BRCA_ttest$Hugo_Symbol)
+
+panc_BRCA_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_BRCA_ttest$Hugo_Symbol)] <- "Has_Mut"
+panc_BRCA_ttest$Hugo_Symbol[grepl("^RAD", panc_in$Hugo_Symbol)] <- "Has_Mut"
+panc_BRCA_ttest$Hugo_Symbol[panc_BRCA_ttest$Hugo_Symbol != "Has_Mut"] <- "Lacks Mut"
+distinct(panc_BRCA_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_BRCA_ttest)
+
+
+#BRCA + FANC family
+panc_BRCA <- droplevels(panc_in[grepl("^BRCA", panc_in$Hugo_Symbol), ])
+mut_list <- panc_BRCA$Hugo_Symbol
+
+panc_BRCA_ttest <- panc_in
+panc_BRCA_ttest$Hugo_Symbol <- as.character(panc_BRCA_ttest$Hugo_Symbol)
+
+panc_BRCA_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_BRCA_ttest$Hugo_Symbol)] <- "Has_Mut"
+panc_BRCA_ttest$Hugo_Symbol[grepl("^FANCI", panc_in$Hugo_Symbol)] <- "Has_Mut"
+panc_BRCA_ttest$Hugo_Symbol[panc_BRCA_ttest$Hugo_Symbol != "Has_Mut"] <- "Lacks Mut"
+distinct(panc_BRCA_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_BRCA_ttest)
+
+
+
+
 ############################################################################################################
 
 
