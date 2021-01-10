@@ -27,7 +27,6 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 ![alt text](https://github.com/jameshyojaelee/gene_knockout_effect/blob/main/UBA2_gene_KO_effect_per_lineage.png)
 
 <br />
-<br />
 
 ## Mutation Analysis
 ### Example with colorectal cancer
@@ -43,6 +42,9 @@ TAK-981 is a novel sumoylation inhibitor created by Takeda. It is allowed for la
 >[Clinical Trials info](https://clinicaltrials.gov/ct2/show/NCT03648372)
 
 <br />
+<br />
+
+TAK-981 inhibition experiment result: https://github.com/jameshyojaelee/cancer_cell_sumoylation/blob/main/inhibition_analysis/inhibition%20results.xlsx
 <br />
 
 ## Pathway Analysis
