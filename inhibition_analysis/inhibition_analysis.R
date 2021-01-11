@@ -333,6 +333,95 @@ distinct(panc_BRCA_ttest, Hugo_Symbol)
 t.test(AUC ~ Hugo_Symbol, data=panc_BRCA_ttest)
 
 
+#BRCA + FANC + ATR + RAD family
+panc_all <- droplevels(panc_in[grepl("^BRCA", panc_in$Hugo_Symbol), ])
+mut_list <- panc_BRCA$Hugo_Symbol
+
+panc_all_ttest <- panc_in
+panc_all_ttest$Hugo_Symbol <- as.character(panc_all_ttest$Hugo_Symbol)
+
+panc_all_ttest$Hugo_Symbol[grep(paste0("^", mut_list, collapse="|"), panc_all_ttest$Hugo_Symbol)] <- "Has_Mut"
+panc_all_ttest$Hugo_Symbol[grepl("^FANC", panc_in$Hugo_Symbol)] <- "Has_Mut"
+panc_all_ttest$Hugo_Symbol[grepl("^RAD", panc_in$Hugo_Symbol)] <- "Has_Mut"
+panc_all_ttest$Hugo_Symbol[grepl("^ATR", panc_in$Hugo_Symbol)] <- "Has_Mut"
+panc_all_ttest$Hugo_Symbol[panc_all_ttest$Hugo_Symbol != "Has_Mut"] <- "Lacks Mut"
+distinct(panc_all_ttest, Hugo_Symbol)
+
+t.test(AUC ~ Hugo_Symbol, data=panc_all_ttest)
+
+
+# combination group plot (BRCA+FANC+RAD+ATR)
+library(ggplot2)
+
+enrich_title <- paste("AUC of cell lines with mutations in", colorectal$lineage ,"cancer cells \n (",
+                      length(which(colorectal$UBA2_gene_effect < colorectal_average)),
+                      "cell lines out of ",length(colorectal$UBA2_gene_effect)," with UBA2 score <" ,
+                      round(colorectal_average, digits = 3), ")")
+
+
+combo_boxplot <- ggplot(panc_all_ttest, aes(x=Hugo_Symbol, y=AUC, fill=Hugo_Symbol)) + 
+  ggtitle("AUC of cell lines with mutations in \nBRCA+FANC+RAD+ATR \n(p-value = 0.011)") +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) + 
+  geom_boxplot() + 
+  theme_bw() +
+  theme(plot.title = element_text(size=12))
+
+combo_boxplot
+
+
+
+
+
+############################################################################################################
+
+mut_list <- c("KRAS", "FANC", "ATR", "RAD", "BRCA")
+plot_group <- panc_in[grep(paste0("^", mut_list, collapse="|"), panc_in$Hugo_Symbol), ]
+plot_group$Hugo_Symbol <- as.character(plot_group$Hugo_Symbol)
+
+plot_group$Hugo_Symbol[grepl("^FANC", plot_group$Hugo_Symbol)] <- "FANC"
+plot_group$Hugo_Symbol[grepl("^ATR", plot_group$Hugo_Symbol)] <- "ATR"
+plot_group$Hugo_Symbol[grepl("^RAD", plot_group$Hugo_Symbol)] <- "RAD"
+plot_group$Hugo_Symbol[grepl("^BRCA", plot_group$Hugo_Symbol)] <- "BRCA"
+
+plot_group$Hugo_Symbol <- as.factor(plot_group$Hugo_Symbol)
+
+#fix the ordering
+plot_group$Hugo_Symbol <- factor(plot_group$Hugo_Symbol, 
+                                 levels = c("KRAS", "FANC", "RAD","ATR","BRCA"), ordered = TRUE)
+
+
+library(ggplot2)
+boxplot <- ggplot(plot_group, aes(x=Hugo_Symbol, y=AUC, fill=Hugo_Symbol)) + 
+  ggtitle("AUC distributions of cells with significant mutations") +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) + 
+  geom_boxplot() + theme_bw()
+
+boxplot
+
+
+
+#p-value dot plot
+
+pvalue_group <- read.csv("C:/Users/james/Desktop/Sumoylation_Analysis/project/inhibition_analysis/mutation_pvalues.csv", fileEncoding="UTF-8-BOM")
+
+
+pvalue_group$gene <- factor(pvalue_group$gene, 
+                                 levels = c("KRAS", "FANC", "RAD","ATR","BRCA", "BRCA+ATR", "BRCA+RAD", "BRCA+FANC", "BRCA+FANC+RAD+ATR"), ordered = TRUE)
+
+pvalue_plot <- ggplot(pvalue_group, aes(x=gene, y=p.value)) + 
+  ggtitle("P-values of significant mutations") +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) + 
+  geom_point() + 
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.x=element_blank())
+
+pvalue_plot
+
+
+
+
+
 
 
 ############################################################################################################
@@ -429,3 +518,4 @@ colo_MUC_ttest$Hugo_Symbol[colo_MUC_ttest$Hugo_Symbol != "MUC"] <- "Lacks Mut"
 distinct(colo_MUC_ttest, Hugo_Symbol)
 
 t.test(AUC ~ Hugo_Symbol, data=colo_MUC_ttest)
+

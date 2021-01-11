@@ -9,16 +9,16 @@ COLO741,colorectal,0.0983,254.63
 CW2,colorectal,10,795.28
 DLD1,colorectal,2.0404,438.97
 Gp2D,colorectal,0.0416,204.8
-HCT 116,colorectal,0.1097,378.18
+HCT116,colorectal,0.1097,378.18
 HPAC,pancreatic,0.4757,496.38
 HT29,colorectal,0.3554,473.08
 HT55,colorectal,1.4386,346.38
 HUPT3,pancreatic,0.0908,280.68
 KP2,pancreatic,0.1672,295.73
 LoVo,colorectal,1.4619,500.7
-LS 180,colorectal,0.0721,348.24
-MIA PaCa2,pancreatic,10,621.99
-Panc 1005,pancreatic,0.1985,284.99
+LS180,colorectal,0.0721,348.24
+MIAPaCa2,pancreatic,10,621.99
+Panc1005,pancreatic,0.1985,284.99
 PANC1,pancreatic,1.0142,397.89
 PSN1,pancreatic,0.7061,484.72
 RKO,colorectal,10,797.2
