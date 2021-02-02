@@ -28,7 +28,7 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 
 <br />
 
-## Mutation Analysis
+## 2. Mutation Analysis
 ### Example with colorectal cancer
 ![alt text](https://github.com/jameshyojaelee/gene_knockout_effect/blob/main/mutation_analysis/analysis%20results/colorectal.png)
 <br />
@@ -37,7 +37,7 @@ Go to "download" to view the details of CRISPR(Avana) Public data, expression da
 <br />
 <br />
 
-# 2. Sumoylation Inhibition using TAK-981
+# 3. Sumoylation Inhibition using TAK-981
 TAK-981 is a novel sumoylation inhibitor created by Takeda. It is allowed for lab uses and is currently going through human trials. 
 >[Clinical Trials info](https://clinicaltrials.gov/ct2/show/NCT03648372)
 
@@ -47,7 +47,7 @@ TAK-981 is a novel sumoylation inhibitor created by Takeda. It is allowed for la
 TAK-981 inhibition experiment result: https://github.com/jameshyojaelee/cancer_cell_sumoylation/blob/main/inhibition_analysis/inhibition%20results.xlsx
 <br />
 
-## Pathway Analysis
+## 4. Pathway Analysis
 ### Example with HUWE1 (found in colorectal cancer mutation analysis) 
 ![alt text](https://github.com/jameshyojaelee/Gene_knockout_effect/blob/main/pathway_analysis/HUWE1/hsa04120.png)
 
